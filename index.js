@@ -5,8 +5,6 @@ const ast = esprima.parseScript(fs.readFileSync("./target/index.js", "utf8"), {
   loc: true
 });
 
-// console.log(JSON.stringify(ast, null, "  "));
-
 const flat = arr => {
   return arr.reduce((acc, item) => {
     return Array.isArray(item) ? [...acc, ...flat(item)] : [...acc, item];
@@ -31,14 +29,16 @@ const detectIf = (node, acc) => {
     return detectIf(node.value.body, acc);
   }
   if (node.type === "IfStatement") {
-    return detectIf(node.body, [...acc, node]);
+    return detectIf(
+      node.body,
+      node.consequent.alternate ? acc : [...acc, node]
+    );
   }
   if (node.type === "BlockStatement") {
-    console.log(node.body);
     return detectIf(node.body, acc);
   }
 
   return acc;
 };
 
-console.log(detectIf(ast, []));
+console.log(JSON.stringify(detectIf(ast, []), null, "  "));
