@@ -11,6 +11,12 @@ const flat = arr => {
   }, []);
 };
 
+const includeOnlyNoAltIfStatement = node => {
+  if (node.length > 1) return false;
+  if (node[0].type !== "IfStatement") return false;
+  return !node[0].alternate;
+};
+
 const detectIf = (node, acc) => {
   if (!node) return acc;
   if (Array.isArray(node)) {
@@ -28,17 +34,29 @@ const detectIf = (node, acc) => {
   if (node.type === "MethodDefinition") {
     return detectIf(node.value.body, acc);
   }
-  if (node.type === "IfStatement") {
-    return detectIf(
-      node.body,
-      node.consequent.alternate ? acc : [...acc, node]
-    );
+  if (node.type === "ArrowFunctionExpression") {
+    return detectIf(node.body, acc);
+  }
+  if (node.type === "VariableDeclaration") {
+    const result = node.declarations
+      .map(n => detectIf(n, acc))
+      .reduce((item, a) => {
+        return [...a, ...item];
+      });
+    return flat(result);
+  }
+  if (node.type === "VariableDeclarator") {
+    return detectIf(node.init, acc);
   }
   if (node.type === "BlockStatement") {
-    return detectIf(node.body, acc);
+    const ifStatementOnly = includeOnlyNoAltIfStatement(node.body);
+    if (ifStatementOnly) console.log(JSON.stringify(node.body, null, "  "));
+    return detectIf(node.body, ifStatementOnly ? [...acc, node] : acc);
   }
 
   return acc;
 };
 
-console.log(JSON.stringify(detectIf(ast, []), null, "  "));
+const result = detectIf(ast, []);
+console.log(`detected nodes: ${result.length}`);
+console.log(JSON.stringify(result, null, "  "));
