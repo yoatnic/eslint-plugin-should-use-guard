@@ -1,3 +1,9 @@
+function f() {
+  if (false) {
+    console.log("foo func1");
+  }
+}
+
 const x = () => {
   if (false) {
     console.log("foo func1");

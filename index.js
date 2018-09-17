@@ -2,7 +2,7 @@ const fs = require("fs");
 const esprima = require("esprima");
 
 const ast = esprima.parseScript(fs.readFileSync("./target/index.js", "utf8"), {
-  loc: true
+  // loc: true
 });
 
 const flat = arr => {
@@ -34,6 +34,9 @@ const detectIf = (node, acc) => {
   if (node.type === "MethodDefinition") {
     return detectIf(node.value.body, acc);
   }
+  if (node.type === "FunctionDeclaration") {
+    return detectIf(node.body, acc);
+  }
   if (node.type === "ArrowFunctionExpression") {
     return detectIf(node.body, acc);
   }
@@ -50,7 +53,6 @@ const detectIf = (node, acc) => {
   }
   if (node.type === "BlockStatement") {
     const ifStatementOnly = includeOnlyNoAltIfStatement(node.body);
-    if (ifStatementOnly) console.log(JSON.stringify(node.body, null, "  "));
     return detectIf(node.body, ifStatementOnly ? [...acc, node] : acc);
   }
 
