@@ -17,48 +17,52 @@ const includeOnlyNoAltIfStatement = node => {
   return !node[0].alternate;
 };
 
-const detectIf = (node, acc) => {
+const detectIfBlock = (node, acc) => {
   if (!node) return acc;
   if (Array.isArray(node)) {
-    return node.map(n => detectIf(n, acc));
+    return node.map(n => detectIfBlock(n, acc));
   }
   if (node.type === "Program") {
-    const result = node.body.map(n => detectIf(n, acc)).reduce((item, a) => {
-      return [...a, ...item];
-    });
+    const result = node.body
+      .map(n => detectIfBlock(n, acc))
+      .reduce((item, a) => {
+        return [...a, ...item];
+      });
     return flat(result);
   }
   if (node.type === "ClassDeclaration") {
-    return detectIf(node.body.body, acc);
+    return detectIfBlock(node.body.body, acc);
   }
   if (node.type === "MethodDefinition") {
-    return detectIf(node.value.body, acc);
+    return detectIfBlock(node.value.body, acc);
   }
   if (node.type === "FunctionDeclaration") {
-    return detectIf(node.body, acc);
+    return detectIfBlock(node.body, acc);
   }
   if (node.type === "ArrowFunctionExpression") {
-    return detectIf(node.body, acc);
+    return detectIfBlock(node.body, acc);
   }
   if (node.type === "VariableDeclaration") {
     const result = node.declarations
-      .map(n => detectIf(n, acc))
+      .map(n => detectIfBlock(n, acc))
       .reduce((item, a) => {
         return [...a, ...item];
       });
     return flat(result);
   }
   if (node.type === "VariableDeclarator") {
-    return detectIf(node.init, acc);
+    return detectIfBlock(node.init, acc);
   }
   if (node.type === "BlockStatement") {
     const ifStatementOnly = includeOnlyNoAltIfStatement(node.body);
-    return detectIf(node.body, ifStatementOnly ? [...acc, node] : acc);
+    return detectIfBlock(node.body, ifStatementOnly ? [...acc, node] : acc);
   }
 
   return acc;
 };
 
-const result = detectIf(ast, []);
-console.log(`detected nodes: ${result.length}`);
-console.log(JSON.stringify(result, null, "  "));
+module.exports = detectIfBlock;
+
+// const result = detectIfBlock(ast, []);
+// console.log(`detected nodes: ${result.length}`);
+// console.log(JSON.stringify(result, null, "  "));
