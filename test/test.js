@@ -3,6 +3,68 @@ const esprima = require("esprima");
 const detectIfBlock = require("../index");
 
 describe("Test", () => {
+  describe("Arrow Function with declare var", () => {
+    it("if only no else", () => {
+      const ast = esprima.parseScript(
+        `
+        const x = () => {
+          if (true) {
+            console.log("hoge");
+          }
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 1);
+      assert(result[0].type === "BlockStatement");
+      assert(result[0].body[0].type === "IfStatement");
+    });
+
+    it("if and else", () => {
+      const ast = esprima.parseScript(
+        `
+        const x = () => {
+          if (true) {
+            console.log("hoge");
+          }
+          else {
+            console.log("fuga");
+          }
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 0);
+    });
+
+    it("if with expression", () => {
+      const ast = esprima.parseScript(
+        `
+        const x = () => {
+          if (true) {
+            console.log("hoge");
+          }
+          console.log("fuga");
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 0);
+    });
+  });
+
   describe("Function", () => {
     it("if only no else", () => {
       const ast = esprima.parseScript(
