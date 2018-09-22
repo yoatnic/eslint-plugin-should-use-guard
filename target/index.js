@@ -25,6 +25,12 @@ const z = () => {
   console.log("exp");
 };
 
+[1].forEach(() => {
+  if (true) {
+    console.log("higher function");
+  }
+});
+
 class Foo {
   method1() {
     if (false) {

@@ -50,6 +50,17 @@ const detectIfBlock = (node, acc) => {
       });
     return flat(result);
   }
+  if (node.type === "ExpressionStatement") {
+    return detectIfBlock(node.expression, acc);
+  }
+  if (node.type === "CallExpression") {
+    const result = node.arguments
+      .map(n => detectIfBlock(n, acc))
+      .reduce((item, a) => {
+        return [...a, ...item];
+      });
+    return flat(result);
+  }
   if (node.type === "VariableDeclarator") {
     return detectIfBlock(node.init, acc);
   }
@@ -65,4 +76,5 @@ module.exports = detectIfBlock;
 
 // const result = detectIfBlock(ast, []);
 // console.log(`detected nodes: ${result.length}`);
+// console.log(JSON.stringify(ast, null, "  "));
 // console.log(JSON.stringify(result, null, "  "));
