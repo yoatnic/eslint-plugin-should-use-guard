@@ -26,6 +26,30 @@ describe("Test", () => {
       assert(result[0].body[0].type === "IfStatement");
     });
 
+    it("if with declare var", () => {
+      const ast = esprima.parseScript(
+        `
+        class C {
+          method() {
+            const x = true;
+            if (x) {
+              console.log("hoge");
+            }
+          }
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 1);
+      assert(result[0].type === "BlockStatement");
+      assert(result[0].body[0].type === "VariableDeclaration");
+      assert(result[0].body[1].type === "IfStatement");
+    });
+
     it("if and else", () => {
       const ast = esprima.parseScript(
         `
@@ -92,6 +116,28 @@ describe("Test", () => {
       assert(result[0].body[0].type === "IfStatement");
     });
 
+    it("if with declare var", () => {
+      const ast = esprima.parseScript(
+        `
+        [1].forEach(() => {
+          const x = true;
+          if (x) {
+            console.log("hoge");
+          }
+        });
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 1);
+      assert(result[0].type === "BlockStatement");
+      assert(result[0].body[0].type === "VariableDeclaration");
+      assert(result[0].body[1].type === "IfStatement");
+    });
+
     it("if and else", () => {
       const ast = esprima.parseScript(
         `
@@ -154,6 +200,28 @@ describe("Test", () => {
       assert(result[0].body[0].type === "IfStatement");
     });
 
+    it("if with declare var", () => {
+      const ast = esprima.parseScript(
+        `
+        const x = () => {
+          const y = true;
+          if (y) {
+            console.log("hoge");
+          }
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 1);
+      assert(result[0].type === "BlockStatement");
+      assert(result[0].body[0].type === "VariableDeclaration");
+      assert(result[0].body[1].type === "IfStatement");
+    });
+
     it("if and else", () => {
       const ast = esprima.parseScript(
         `
@@ -214,6 +282,28 @@ describe("Test", () => {
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
       assert(result[0].body[0].type === "IfStatement");
+    });
+
+    it("if with declare var", () => {
+      const ast = esprima.parseScript(
+        `
+        function f() {
+          const x = true;
+          if (x) {
+            console.log("hoge");
+          }
+        }
+      `,
+        {
+          loc: true
+        }
+      );
+      const result = detectIfBlock(ast, []);
+
+      assert(result.length === 1);
+      assert(result[0].type === "BlockStatement");
+      assert(result[0].body[0].type === "VariableDeclaration");
+      assert(result[0].body[1].type === "IfStatement");
     });
 
     it("if and else", () => {

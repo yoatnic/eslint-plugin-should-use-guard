@@ -12,9 +12,10 @@ const flat = arr => {
 };
 
 const includeOnlyNoAltIfStatement = node => {
-  if (node.length > 1) return false;
-  if (node[0].type !== "IfStatement") return false;
-  return !node[0].alternate;
+  const excludeVar = node.filter(n => n.type !== "VariableDeclaration");
+  if (excludeVar.length > 1) return false;
+  if (excludeVar[0].type !== "IfStatement") return false;
+  return !excludeVar[0].alternate;
 };
 
 const detectIfBlock = (node, acc) => {
@@ -66,7 +67,7 @@ const detectIfBlock = (node, acc) => {
   }
   if (node.type === "BlockStatement") {
     const ifStatementOnly = includeOnlyNoAltIfStatement(node.body);
-    return detectIfBlock(node.body, ifStatementOnly ? [...acc, node] : acc);
+    return ifStatementOnly ? [...acc, node] : acc;
   }
 
   return acc;
