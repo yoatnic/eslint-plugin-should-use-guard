@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint target/index.js --rulesdir ./eslint/rules",
     "start": "node index.js",
     "test": "$(npm bin)/mocha --require intelli-espower-loader"
   },

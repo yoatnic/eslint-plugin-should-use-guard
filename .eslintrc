@@ -1,3 +1,6 @@
 {
-  "parser": "esprima"
+  "parser": "esprima",
+  "rules": {
+    "shuold-use-gurad": 2
+  }
 }
