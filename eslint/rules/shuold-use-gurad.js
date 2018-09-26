@@ -1,11 +1,11 @@
-const detectIfBlock = require("../../index");
+const includeOnlyNoAltIfStatement = require("../../index");
 
 module.exports = function(context) {
   return {
     BlockStatement: function(node) {
-      const result = detectIfBlock(node);
+      const result = includeOnlyNoAltIfStatement(node.body);
 
-      if (result.length > 0) {
+      if (result) {
         context.report({ node: node, message: "shoud use guard" });
       }
     }

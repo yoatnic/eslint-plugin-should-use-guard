@@ -18,6 +18,8 @@ const includeOnlyNoAltIfStatement = node => {
   return !excludeVar[0].alternate;
 };
 
+module.exports = includeOnlyNoAltIfStatement;
+
 const detectIfBlock = (node, acc) => {
   if (!node) return acc;
   if (Array.isArray(node)) {
@@ -72,8 +74,6 @@ const detectIfBlock = (node, acc) => {
 
   return acc;
 };
-
-module.exports = detectIfBlock;
 
 // const result = detectIfBlock(ast, []);
 // console.log(`detected nodes: ${result.length}`);

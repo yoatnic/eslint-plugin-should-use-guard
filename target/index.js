@@ -1,5 +1,6 @@
 function f() {
-  if (false) {
+  const x = 0;
+  if (x) {
     console.log("foo func1");
   }
 }
