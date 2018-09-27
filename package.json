@@ -1,5 +1,5 @@
 {
-  "name": "til-ast",
+  "name": "eslint-plugin-should-use-guard",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",

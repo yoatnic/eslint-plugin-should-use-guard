@@ -1,6 +1,64 @@
 const assert = require("power-assert");
 const esprima = require("esprima");
-const detectIfBlock = require("../index");
+const { includeOnlyNoAltIfStatement } = require("../index");
+const flat = arr => {
+  return arr.reduce((acc, item) => {
+    return Array.isArray(item) ? [...acc, ...flat(item)] : [...acc, item];
+  }, []);
+};
+
+const traverse = (node, acc) => {
+  if (!node) return acc;
+  if (Array.isArray(node)) {
+    return node.map(n => traverse(n, acc));
+  }
+  if (node.type === "Program") {
+    const result = node.body.map(n => traverse(n, acc)).reduce((item, a) => {
+      return [...a, ...item];
+    });
+    return flat(result);
+  }
+  if (node.type === "ClassDeclaration") {
+    return traverse(node.body.body, acc);
+  }
+  if (node.type === "MethodDefinition") {
+    return traverse(node.value.body, acc);
+  }
+  if (node.type === "FunctionDeclaration") {
+    return traverse(node.body, acc);
+  }
+  if (node.type === "ArrowFunctionExpression") {
+    return traverse(node.body, acc);
+  }
+  if (node.type === "VariableDeclaration") {
+    const result = node.declarations
+      .map(n => traverse(n, acc))
+      .reduce((item, a) => {
+        return [...a, ...item];
+      });
+    return flat(result);
+  }
+  if (node.type === "ExpressionStatement") {
+    return traverse(node.expression, acc);
+  }
+  if (node.type === "CallExpression") {
+    const result = node.arguments
+      .map(n => traverse(n, acc))
+      .reduce((item, a) => {
+        return [...a, ...item];
+      });
+    return flat(result);
+  }
+  if (node.type === "VariableDeclarator") {
+    return traverse(node.init, acc);
+  }
+  if (node.type === "BlockStatement") {
+    const ifStatementOnly = includeOnlyNoAltIfStatement(node.body);
+    return ifStatementOnly ? [...acc, node] : acc;
+  }
+
+  return acc;
+};
 
 describe("Test", () => {
   describe("Class Method", () => {
@@ -19,7 +77,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -42,7 +100,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -68,7 +126,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -89,7 +147,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -109,7 +167,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -130,7 +188,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -154,7 +212,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -173,7 +231,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -193,7 +251,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -214,7 +272,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -238,7 +296,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -257,7 +315,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -277,7 +335,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -298,7 +356,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 1);
       assert(result[0].type === "BlockStatement");
@@ -322,7 +380,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
@@ -341,7 +399,7 @@ describe("Test", () => {
           loc: true
         }
       );
-      const result = detectIfBlock(ast, []);
+      const result = traverse(ast, []);
 
       assert(result.length === 0);
     });
