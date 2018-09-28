@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yoatnic/til-ast.git"
+    "url": "git+https://github.com/yoatnic/til-eslint-plugin-should-use-guard.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yoatnic/til-ast/issues"
+    "url": "https://github.com/yoatnic/til-eslint-plugin-should-use-guard/issues"
   },
-  "homepage": "https://github.com/yoatnic/til-ast#readme",
+  "homepage": "https://github.com/yoatnic/til-eslint-plugin-should-use-guard#readme",
   "dependencies": {
     "eslint": "^5.6.0",
     "esprima": "^4.0.1"
